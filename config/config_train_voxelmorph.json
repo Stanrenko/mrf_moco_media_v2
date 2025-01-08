@@ -1,0 +1,14 @@
+{
+    "nb_features":[
+                    [32, 64, 128, 128],         
+                    [128, 128, 64, 64, 32, 16]  
+                  ],
+    "optimizer":"Adam",
+    "lambda":1.0,
+    "nb_epochs": 1500,
+    "batch_size":16,
+    "loss":"NCC",
+    "lr_decay":0.0015,
+    "lr": 0.001,
+    "min_lr":0.0002
+}

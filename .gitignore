@@ -1,0 +1,8 @@
+/.idea
+/.venv
+/__pycache__
+/wandb
+/data
+dictionary.dict
+dictionary_light.dict
+
