@@ -13,13 +13,36 @@ conda create --name <env> --file requirements.txt
 conda activate <env>
 ```
 
+Weights & Biases is required to run the neural network training for monitoring - create an account there: https://wandb.ai/site/ to get the API key.
+
+
+## Data
+
+Data from the motion scan can be pulled using:
+
+```
+python pull_example_data.py --url 'https://github.com/Stanrenko/mrf_moco_media_v2/releases/download/v1.0.0/inputs_motion.zip' --data_dir './data'
+```
+
+Data from the MRF scan can be pulled using:
+
+```
+python pull_example_data.py --url 'https://github.com/Stanrenko/mrf_moco_media_v2/releases/download/v1.0.0/inputs_mrf.zip' --data_dir './data'
+```
+
+MRF dictionaries can be pulled using:
+
+```
+python pull_example_data.py --url 'https://github.com/Stanrenko/mrf_moco_media_v2/releases/download/v1.0.0/dictionaries.zip'
+```
+
 ## Snippet code for MoCo MRF T1-FF post-processing
 
 4 blocks are illustrated here:
 
-### Displacement extraction from navigator images and binning (steps 1 and 3 in Figure 1)
+### 1. Displacement extraction from navigator images and binning (steps 1 and 3 in Figure 1)
 
-This code extracts respiratory displacement from raw navigators k-space data.
+This code extracts respiratory displacement from raw navigators motion scan k-space data.
 
 On the motion scan, no seasonality adjustment is used. The displacements calculated on the motion scan are used to calculate the edges of the bins.
 The channel with the best contrast for displacment extraction should be provided.
@@ -34,7 +57,7 @@ On the Magnetic Resonance Fingerprinting (mrf) scan, seasonality adjustment is u
 python extract_displacement.py --filenamenav data/mrf_scan_raw_nav.npy --ch 17 --filenamebins data/motion_scan_raw_bins.npy --seasonaladj True --hardinterp True
 ```
 
-### Estimating deformation field with Voxelmorph from motion scan rebuilt volumes for all bins (step 2 in Figure 1)
+### 2. Estimating deformation field with Voxelmorph from motion scan volumes for all bins (step 2 in Figure 1)
 
 The code outputs the gif showing the movie of registered volumes vs the movie of unregistered volumes, and saves the deformation map in motion_scan_volumes_allbins_deformation_map.npy
 
@@ -42,18 +65,18 @@ The code outputs the gif showing the movie of registered volumes vs the movie of
 python estimate_deformation.py --filenamevol data/motion_scan_volumes_allbins.npy --fileconfig config/config_train_voxelmorph.json --nepochs 1 --keptbins "0,1,2,3"
 ```
 
-### Building motion-corrected singular volumes and mask from mrf singular volumes for all bins and estimated deformation fields (step 4 in Figure 1)
+### 3. Building motion-corrected mrf singular volumes and mask from mrf singular volumes for all bins and estimated deformation fields (step 4 in Figure 1)
 
-The singular volumes are obtained by projecting the acquired signals on the mrf temporal basis dictionary_phi_L0_6.npy. The weights are the gating weights. 
+The mrf singular volumes are obtained by projecting the acquired signals on the mrf temporal basis dictionary_phi_L0_6.npy. The weights are the gating weights. 
 
 ```
 python build_moco_mrf_volumes.py --filenamevol data/mrf_scan_singular_volumes_allbins.npy --fileb1 data/coil_sensi.npy --fileweights data/mrf_scan_raw_weights.npy --filedef data/motion_scan_volumes_allbins_deformation_map.npy
 ```
 
 
-### Building parametric maps from motion-corrected mrf singular volumes (step 5 in Figure 1)
+### 4. Building parametric maps from motion-corrected mrf singular volumes (step 5 in Figure 1)
 
-The pattern matching used is the bicomponent dictionary matching with clustering ([[1]](#1)), which uses first a coarse dictionary (dictfilelight) to cluster the signals efficiently.
+The pattern matching used is the bicomponent dictionary matching with clustering ([[1]](#1)), which uses first a coarse dictionary (dictionary_light.dict) to cluster the signals efficiently before matching on the full dictionary (dictionary.dict).
 
 The dictionaries are stored in .dict files, the keys being the parameter values (water T1, fat T1, B1, df). FF is matched in a first step using a closed form formula as described in [[1]](#1).
 
