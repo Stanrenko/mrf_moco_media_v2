@@ -18,6 +18,7 @@ import pickle
 from sklearn.base import BaseEstimator, TransformerMixin  # This function just makes sure that the object is fitted
 from sklearn.utils.validation import check_is_fitted
 import matplotlib.pyplot as plt
+from utils import build_mask_from_volume
 
 
 class PCAComplex(BaseEstimator,TransformerMixin):
@@ -220,20 +221,16 @@ def match_signals_v2(all_signals,keys,pca_water,pca_fat,array_water_unique,array
             current_sig_ws_for_phase=sig_ws_all_unique
             current_sig_fs_for_phase=sig_fs_all_unique
 
-        # current_sig_ws = current_sig_ws_for_phase.real
-        # current_sig_fs = current_sig_fs_for_phase.real
-
         if verbose:
             end = datetime.now()
             print(end - start)
 
         if not (useGPU_dictsearch):
-            # if adj_phase:
+
             if verbose:
                 print("Adjusting Phase")
                 print("Calculating alpha optim and flooring")
 
-                ### Testing direct phase solving
             A = sig_wf * current_sig_ws_for_phase - var_w * current_sig_fs_for_phase
             B = (
                         current_sig_ws_for_phase + current_sig_fs_for_phase) * sig_wf - var_w * current_sig_fs_for_phase - var_f * current_sig_ws_for_phase
@@ -254,18 +251,8 @@ def match_signals_v2(all_signals,keys,pca_water,pca_fat,array_water_unique,array
             current_alpha_all_unique = (1 * (alpha1 >= 0) & (alpha1 <= 1)) * alpha1 + (
                     1 - (1 * (alpha1 >= 0) & (alpha1 <= 1))) * alpha2
 
-            # current_alpha_all_unique_2 = (1 * (alpha2 >= 0) & (alpha2 <= 1)) * alpha2 + (
-            #            1 - (1*(alpha2 >= 0) & (alpha2 <= 1))) * alpha1
-
-            #del alpha1
-            #del alpha2
-
             if verbose:
                 start = datetime.now()
-
-
-
-            #current_alpha_all_unique = np.minimum(np.maximum(current_alpha_all_unique, 0.0), 1.0)
 
             apha_more_0=(current_alpha_all_unique>=0)
             alpha_less_1=(current_alpha_all_unique<=1)
@@ -282,13 +269,10 @@ def match_signals_v2(all_signals,keys,pca_water,pca_fat,array_water_unique,array
                 end = datetime.now()
                 print(end - start)
 
-            # alpha_all_unique[:, j_signal:j_signal_next] = current_alpha_all_unique
             if verbose:
                 print("Calculating cost for all signals")
             start = datetime.now()
 
-            #current_sig_ws = (current_sig_ws_for_phase * np.exp(1j * phase_adj)).real
-            #current_sig_fs = (current_sig_fs_for_phase * np.exp(1j * phase_adj)).real
 
             J_all = np.abs((
                              1 - current_alpha_all_unique) * current_sig_ws_for_phase + current_alpha_all_unique * current_sig_fs_for_phase) / np.sqrt(
@@ -401,31 +385,17 @@ def match_signals_v2(all_signals,keys,pca_water,pca_fat,array_water_unique,array
             J_0 = cp.abs(current_sig_ws_for_phase) / cp.sqrt(var_w)
             J_1 = cp.abs(current_sig_fs_for_phase) / cp.sqrt(var_f)
 
-            # print(current_alpha_all_unique.shape)
-            # print(J_1.shape)
-            # print(J_0.shape)
-            # print(alpha_out_bounds.shape)
-
             current_alpha_all_unique[alpha_out_bounds] = cp.argmax(
                 cp.reshape(cp.concatenate([J_0[alpha_out_bounds], J_1[alpha_out_bounds]], axis=-1), (-1, 2)), axis=-1)
-            # phase_adj = np.angle((
-            #                                 1 - current_alpha_all_unique) * current_sig_ws_for_phase + current_alpha_all_unique * current_sig_fs_for_phase)
-
-
 
             if verbose:
                 end = datetime.now()
                 print(end - start)
 
-            # alpha_all_unique[:, j_signal:j_signal_next] = current_alpha_all_unique
             if verbose:
                 print("Calculating cost for all signals")
                 start = datetime.now()
 
-
-            # del phase_adj
-            #del current_sig_ws_for_phase
-            #del current_sig_fs_for_phase
 
             J_all = cp.abs((
                              1 - current_alpha_all_unique) * current_sig_ws_for_phase + current_alpha_all_unique * current_sig_fs_for_phase) / np.sqrt(
@@ -451,8 +421,6 @@ def match_signals_v2(all_signals,keys,pca_water,pca_fat,array_water_unique,array
             idx_max_all_current = cp.argmax(J_all, axis=0)
             current_alpha_all_unique_optim = current_alpha_all_unique[idx_max_all_current, np.arange(J_all.shape[1])]
 
-
-            #current_alpha_all_unique_optim = current_alpha_all_unique_optim.get()
             idx_max_all_unique[j_signal:j_signal_next] = idx_max_all_current
             alpha_optim[j_signal:j_signal_next]=current_alpha_all_unique_optim
 
@@ -499,9 +467,6 @@ def match_signals_v2(all_signals,keys,pca_water,pca_fat,array_water_unique,array
             print("Extracting index of pattern with max correl")
             start = datetime.now()
 
-        #idx_max_all_current = np.argmax(J_all, axis=0)
-        # check_max_correl=np.max(J_all,axis=0)
-
         if verbose:
             end = datetime.now()
             print(end - start)
@@ -531,9 +496,6 @@ def match_signals_v2(all_signals,keys,pca_water,pca_fat,array_water_unique,array
     if useGPU_dictsearch:
         idx_max_all_unique=idx_max_all_unique.get()
         alpha_optim=alpha_optim.get()
-    # idx_max_all_unique = np.argmax(J_all, axis=0)
-    #del J_all
-    #del current_alpha_all_unique
 
     if (niter > 0) or return_matched_signals:
         phase_optim = np.array(phase_optim)
@@ -579,8 +541,7 @@ def match_signals_v2(all_signals,keys,pca_water,pca_fat,array_water_unique,array
 
 
 def match_signals_v2_clustered_on_dico(all_signals_current,keys,pca_water,pca_fat,transformed_array_water_unique,transformed_array_fat_unique,var_w_total,var_f_total,sig_wf_total,index_water_unique,index_fat_unique,useGPU_dictsearch,unique_keys,d_T1,d_fT1,d_B1,d_DF,labels,split,high_ff=False,return_cost=False):
-    #nb_signals_low_ff = len(ind_low_ff)
-    #nb_signals_high_ff = len(ind_high_ff)
+
     nb_clusters = unique_keys.shape[-1]
 
     nb_signals=all_signals_current.shape[-1]
@@ -606,15 +567,11 @@ def match_signals_v2_clustered_on_dico(all_signals_current,keys,pca_water,pca_fa
             nb_signals_cluster=len(indices)
             num_group = int(nb_signals_cluster / split) + 1
 
-            # if j_signal==nb_signals:
-            #    break
             keys_T1 = (keys[:, 0] < unique_keys[:, cl][0] + d_T1) & ((keys[:, 0] > unique_keys[:, cl][0] - d_T1))
             keys_fT1 = (keys[:, 1] < unique_keys[:, cl][1] + d_fT1) & ((keys[:, 1] > unique_keys[:, cl][1] - d_fT1))
             keys_B1 = (keys[:, 2] < unique_keys[:, cl][2] + d_B1) & ((keys[:, 2] > unique_keys[:, cl][2] - d_B1))
             keys_DF = (keys[:, 3] < unique_keys[:, cl][3] + d_DF) & ((keys[:, 3] > unique_keys[:, cl][3] - d_DF))
             retained_signals = np.argwhere(keys_T1 & keys_fT1 & keys_B1 & keys_DF).flatten()
-
-            #print(retained_signals.shape)
 
 
             var_w = var_w_total[retained_signals]
@@ -659,7 +616,7 @@ def match_signals_v2_clustered_on_dico(all_signals_current,keys,pca_water,pca_fa
                 del discr
                 current_alpha_all_unique = (1 * (alpha1 >= 0) & (alpha1 <= 1)) * alpha1 + (
                         1 - (1 * (alpha1 >= 0) & (alpha1 <= 1))) * alpha2
-                # current_alpha_all_unique = np.minimum(np.maximum(current_alpha_all_unique, 0.0), 1.0)
+
                 apha_more_0 = (current_alpha_all_unique >= 0)
                 alpha_less_1 = (current_alpha_all_unique <= 1)
                 alpha_out_bounds = (1 * (apha_more_0)) * (1 * (alpha_less_1)) == 0
@@ -675,8 +632,6 @@ def match_signals_v2_clustered_on_dico(all_signals_current,keys,pca_water,pca_fa
                 else:
                     current_alpha_all_unique[alpha_out_bounds] = 1
 
-                # current_sig_ws = (current_sig_ws_for_phase * np.exp(1j * phase_adj)).real
-                # current_sig_fs = (current_sig_fs_for_phase * np.exp(1j * phase_adj)).real
                 J_all = np.abs((
                                        1 - current_alpha_all_unique) * current_sig_ws_for_phase + current_alpha_all_unique * current_sig_fs_for_phase) / np.sqrt(
                     (
@@ -733,16 +688,12 @@ def match_signals_v2_clustered_on_dico(all_signals_current,keys,pca_water,pca_fa
             nb_signals_cluster=len(indices)
             num_group = int(nb_signals_cluster / split) + 1
 
-            # if j_signal==nb_signals:
-            #    break
+
             keys_T1 = (keys[:, 0] < unique_keys[:, cl][0] + d_T1) & ((keys[:, 0] > unique_keys[:, cl][0] - d_T1))
             keys_fT1 = (keys[:, 1] < unique_keys[:, cl][1] + d_fT1) & ((keys[:, 1] > unique_keys[:, cl][1] - d_fT1))
             keys_B1 = (keys[:, 2] < unique_keys[:, cl][2] + d_B1) & ((keys[:, 2] > unique_keys[:, cl][2] - d_B1))
             keys_DF = (keys[:, 3] < unique_keys[:, cl][3] + d_DF) & ((keys[:, 3] > unique_keys[:, cl][3] - d_DF))
             retained_signals = cp.argwhere(keys_T1 & keys_fT1 & keys_B1 & keys_DF).flatten()
-
-            #print(retained_signals.shape)
-
 
             var_w = var_w_total[retained_signals]
             var_f = var_f_total[retained_signals]
@@ -803,8 +754,6 @@ def match_signals_v2_clustered_on_dico(all_signals_current,keys,pca_water,pca_fa
                 else:
                     current_alpha_all_unique[alpha_out_bounds] = 1
 
-                # current_sig_ws = (current_sig_ws_for_phase * np.exp(1j * phase_adj)).real
-                # current_sig_fs = (current_sig_fs_for_phase * np.exp(1j * phase_adj)).real
                 J_all = cp.abs((
                                        1 - current_alpha_all_unique) * current_sig_ws_for_phase + current_alpha_all_unique * current_sig_fs_for_phase) / cp.sqrt(
                     (
@@ -831,8 +780,7 @@ def match_signals_v2_clustered_on_dico(all_signals_current,keys,pca_water,pca_fa
 
                 idx_max_all_current_sig = cp.argmax(J_all, axis=0)
                 current_alpha_all_unique_optim = current_alpha_all_unique[idx_max_all_current_sig, cp.arange(J_all.shape[1])]
-                #idx_max_all_current_sig=idx_max_all_current_sig.get()
-                #current_alpha_all_unique_optim = current_alpha_all_unique_optim.get()
+
                 idx_max_all_unique_cluster[j_signal:j_signal_next]=idx_max_all_current_sig
                 alpha_optim_cluster[j_signal:j_signal_next]=current_alpha_all_unique_optim
 
@@ -885,15 +833,14 @@ class Optimizer(object):
 
 class SimpleDictSearch(Optimizer):
 
-    def __init__(self,niter=0,seq=None,trajectory=None,split=500,pca=True,threshold_pca=15,useGPU_dictsearch=False,remove_duplicate_signals=False,threshold=None,return_matched_signals=False,**kwargs):
-        #transf is a function that takes as input timesteps arrays and outputs shifts as output
+    def __init__(self,niter=0,seq=None,split=500,pca=True,threshold_pca=15,useGPU_dictsearch=False,remove_duplicate_signals=False,threshold=None,return_matched_signals=False,**kwargs):
+        
         super().__init__(**kwargs)
         self.paramDict["niter"]=niter
         self.paramDict["split"] = split
         self.paramDict["pca"] = pca
         self.paramDict["threshold_pca"] = threshold_pca
         self.paramDict["remove_duplicate_signals"] = remove_duplicate_signals
-        #self.paramDict["useAdjPred"]=useAdjPred
         self.paramDict["return_matched_signals"] = return_matched_signals
 
 
@@ -917,7 +864,6 @@ class SimpleDictSearch(Optimizer):
         useGPU_dictsearch = self.paramDict["useGPU_dictsearch"]
 
         remove_duplicates = self.paramDict["remove_duplicate_signals"]
-        threshold = self.paramDict["threshold"]
         if pca and (type(dictfile)==str):
             pca_file = str.split(dictfile, ".dict")[0] + "_{}pca_simple.pkl".format(threshold_pca)
             pca_file_name = str.split(pca_file, "/")[-1]
@@ -960,7 +906,6 @@ class SimpleDictSearch(Optimizer):
 
         if not(type(dictfile)==str)or(vars_file_name not in os.listdir(path)) or ((pca) and (pca_file_name not in os.listdir(path))):
 
-            print("Calculating unique dico signals")
             array_water_unique, index_water_unique = np.unique(array_water, axis=0, return_inverse=True)
             array_fat_unique, index_fat_unique = np.unique(array_fat, axis=0, return_inverse=True)
 
@@ -1094,8 +1039,6 @@ class SimpleDictSearch(Optimizer):
         
         threshold_pca=np.minimum(ntimesteps,threshold_pca)
 
-        print(threshold_pca)
-        
         threshold_ff=self.paramDict["threshold_ff"]
         dictfile_light=self.paramDict["dictfile_light"]
 
@@ -1127,7 +1070,6 @@ class SimpleDictSearch(Optimizer):
             vars_file_name=str.split(vars_file,"/")[-1]
             path=str.split(os.path.realpath(__file__),"/dictoptimizers.py")[0]
 
-        print(volumes.shape)
         if volumes.ndim > 2:
             
             all_signals = volumes[:, mask > 0]
@@ -1135,8 +1077,6 @@ class SimpleDictSearch(Optimizer):
         else:  # already masked
             all_signals = volumes
 
-
-        print(all_signals.shape)
         all_signals=all_signals.astype("complex64")
         nb_signals=all_signals.shape[1]
 
@@ -1164,10 +1104,9 @@ class SimpleDictSearch(Optimizer):
             array_water = array_water[:, retained_timesteps]
             array_fat = array_fat[:, retained_timesteps]
 
-        #print(path)
         if not(type(dictfile)==str)or(vars_file_name not in os.listdir(path)) or ((pca) and (pca_file_name not in os.listdir(path))) or (calculate_matched_signals):
 
-            print("Calculating unique dico signals")
+            # print("Calculating unique dico signals")
             array_water_unique, index_water_unique = np.unique(array_water, axis=0, return_inverse=True)
             array_fat_unique, index_fat_unique = np.unique(array_fat, axis=0, return_inverse=True)
 
@@ -1202,11 +1141,6 @@ class SimpleDictSearch(Optimizer):
 
                 pca_water.fit(array_water_unique)
                 pca_fat.fit(array_fat_unique)
-
-                print(
-                    "Water Components Retained {} out of {} timesteps".format(pca_water.n_components_,
-                                                                              nb_water_timesteps))
-                print("Fat Components Retained {} out of {} timesteps".format(pca_fat.n_components_, nb_fat_timesteps))
 
                 transformed_array_water_unique = pca_water.transform(array_water_unique)
                 transformed_array_fat_unique = pca_fat.transform(array_fat_unique)

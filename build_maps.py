@@ -77,7 +77,7 @@ def build_maps(filename_volume,filename_mask,filename_seqParams,dictfile,dictfil
 
     mask=np.load(filename_mask)
 
-    print(volumes_all.shape)
+    print("Volumes shape : {}".format(volumes_all.shape))
 
     ntimesteps=volumes_all.shape[0]
     print("There are {} volumes to match for the fingerprinting".format(ntimesteps))
@@ -106,7 +106,7 @@ def build_maps(filename_volume,filename_mask,filename_seqParams,dictfile,dictfil
             sl=[str(s) for s in sl]
             file_map = "".join(filename_volume.split(".npy")) + "_sl{}_MRF_map.pkl".format("_".join(sl))
 
-    print(file_map)
+    print("Output map file name : {}".format(file_map))
 
 
     threshold_pca=optimizer_config["pca"]
@@ -138,6 +138,7 @@ def build_maps(filename_volume,filename_mask,filename_seqParams,dictfile,dictfil
         del s
         del vh
     else:
+        print("Loading mrf temporal basis : {}".format(filename_phi))
         phi=np.load(filename_phi)
 
     mrfdict = Dictionary()

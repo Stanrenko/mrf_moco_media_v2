@@ -1,6 +1,6 @@
 {
     "pca":6,
-    "split":500,
+    "split":100,
     "useGPU": true,
     "return_matched_signals":false,
     "return_cost":true,

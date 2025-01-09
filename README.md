@@ -13,8 +13,7 @@ conda env create --name <env> --file environment.yml
 conda activate <env>
 ```
 
-Weights & Biases is required to run the neural network training for monitoring - create an account there: https://wandb.ai/site/ to get the API key.
-
+Weights & Biases is required to monitor the neural network training - create an account there: https://wandb.ai/site/ to get the API key and enter it when prompted during training.
 
 ## Data
 
