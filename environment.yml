@@ -180,7 +180,7 @@ dependencies:
   - zlib=1.2.13=h5eee18b_1
   - zstd=1.5.6=hc292b87_0
   - pip:
-      - absl-py==2.1.0
+      - absl-py
       - asttokens==3.0.0
       - astunparse==1.6.3
       - backcall==0.2.0
