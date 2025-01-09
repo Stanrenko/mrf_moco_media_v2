@@ -191,7 +191,7 @@ dependencies:
       - executing==2.1.0
       - filelock==3.16.1
       - finufft==2.3.1
-      - flatbuffers==24.3.25
+      - flatbuffers
       - gast==0.4.0
       - google-auth==1.35.0
       - google-auth-oauthlib==0.4.6
