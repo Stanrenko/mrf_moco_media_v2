@@ -266,5 +266,5 @@ dependencies:
       - voxelmorph==0.2
       - wcwidth==0.2.13
       - werkzeug==3.0.6
-      - wrapt==1.17.0
+      - wrapt
 prefix: /home/slioussarenko/anaconda3/envs/mrf
