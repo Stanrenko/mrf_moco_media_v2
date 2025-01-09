@@ -243,7 +243,7 @@ dependencies:
       - pygments==2.18.0
       - pystrum==0.4
       - requests-oauthlib==2.0.0
-      - rich==13.9.4
+      - rich
       - rsa==4.9
       - segment-anything==1.0
       - shellingham==1.5.4
@@ -262,7 +262,7 @@ dependencies:
       - traitlets==5.14.3
       - triton==2.0.0
       - typer==0.15.1
-      - typing-extensions==4.5.0
+      - typing-extensions
       - voxelmorph==0.2
       - wcwidth==0.2.13
       - werkzeug==3.0.6
