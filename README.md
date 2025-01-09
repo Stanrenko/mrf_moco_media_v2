@@ -56,7 +56,7 @@ On the Magnetic Resonance Fingerprinting (mrf) scan, seasonality adjustment is u
 python extract_displacement.py --filenamenav data/mrf_scan_raw_nav.npy --ch 17 --filenamebins data/motion_scan_raw_bins.npy --seasonaladj True --hardinterp True
 ```
 
-### 2. Estimating deformation field with Voxelmorph from motion scan volumes for all bins (step 2 in Figure 1)
+### 2. Estimating deformation field with Voxelmorph ([[1]](#1)) from motion scan volumes for all bins (step 2 in Figure 1)
 
 The code outputs the gif showing the movie of registered volumes vs the movie of unregistered volumes, and saves the deformation map in motion_scan_volumes_allbins_deformation_map.npy
 
@@ -75,9 +75,9 @@ python build_moco_mrf_volumes.py --filenamevol data/mrf_scan_singular_volumes_al
 
 ### 4. Building parametric maps from motion-corrected mrf singular volumes (step 5 in Figure 1)
 
-The pattern matching used is the bicomponent dictionary matching with clustering ([[1]](#1)), which uses first a coarse dictionary (dictionary_light.dict) to cluster the signals efficiently before matching on the full dictionary (dictionary.dict).
+The pattern matching used is the bicomponent dictionary matching with clustering ([[2]](#2)), which uses first a coarse dictionary (dictionary_light.dict) to cluster the signals efficiently before matching on the full dictionary (dictionary.dict).
 
-The dictionaries are stored in .dict files, the keys being the parameter values (water T1, fat T1, B1, df). FF is matched in a first step using a closed form formula as described in [[1]](#1).
+The dictionaries are stored in .dict files, the keys being the parameter values (water T1, fat T1, B1, df). FF is matched in a first step using a closed form formula as described in [[2]](#2).
 
 ```
 python build_maps.py --filenamevol data/mrf_scan_singular_volumes_allbins_registered_ref0.npy --fileseqparams data/mrf_scan_seqParams.pkl --dictfile dictionary.dict --dictfilelight dictionary_light.dict --fileconfigmrf config/config_build_maps.json 
@@ -85,4 +85,6 @@ python build_maps.py --filenamevol data/mrf_scan_singular_volumes_allbins_regist
 
 ## References
 <a id="1">[1]</a> 
+Balakrishnan G, Zhao A, Sabuncu M. R., Guttag J and Dalca A. V., VoxelMorph: A Learning Framework for Deformable Medical Image Registration. IEEE Transactions on Medical Imaging, Aug. 2019. doi: 10.1109/TMI.2019.2897538
+<a id="2">[2]</a> 
 Slioussarenko C, Baudin P-Y, Reyngoudt H, Marty B. Bi-component dictionary matching for MR fingerprinting for efficient quantification of fat fraction and water T1 in skeletal muscle. Magn Reson Med. 2024; 91: 1179-1189. doi: 10.1002/mrm.29901
