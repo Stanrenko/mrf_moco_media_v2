@@ -256,7 +256,7 @@ dependencies:
       - tensorflow==2.5.2
       - tensorflow-estimator==2.6.0
       - tensorflow-io-gcs-filesystem==0.34.0
-      - termcolor==2.4.0
+      - termcolor
       - torch==2.0.1
       - torchio==0.19.1
       - traitlets==5.14.3
