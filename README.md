@@ -2,8 +2,13 @@
 
 Motion-corrected (MoCo) MRF T1-FF is a framework for free-breathing quantitative MRI that estimates the respiration motion field using an optimized preliminary motion scan and uses it to correct the Magnetic Resonance Fingerprinting acquisition data before dictionary search for reconstructing motion-corrected fat fraction and water T1 parametric maps of the upper-body region.
 
-![Alt text](image/Fig1_MoCoFramework_v2_formatted.jpeg?raw=true "Figure 1: MoCo MRF T1-FF framework")
-
+<!-- ![Alt text](image/Fig1_MoCoFramework_v2_formatted.jpeg?raw=true "Figure 1: MoCo MRF T1-FF framework") -->
+<figure>
+  <img
+  src="image/Fig1_MoCoFramework_v2_formatted.jpeg"
+  alt="MoCo MRF T1-FF framework">
+  <figcaption>Figure 1: MoCo MRF T1-FF framework</figcaption>
+</figure>
 
 ## Requirements
 
