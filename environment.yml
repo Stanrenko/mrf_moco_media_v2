@@ -197,7 +197,7 @@ dependencies:
       - google-auth-oauthlib==0.4.6
       - google-pasta==0.2.0
       - grpcio==1.68.1
-      - h5py==3.11.0
+      - h5py
       - humanize==4.10.0
       - ipython==8.12.3
       - jedi==0.19.2
