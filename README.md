@@ -1,6 +1,6 @@
 # Upper-body free-breathing Magnetic Resonance Fingerprinting applied to the quantification of water T1 and fat fraction
 
-Motion-corrected (MoCo) MRF T1-FF is a framework for free-breathing quantitative MRI that estimates the respiration motion field using an optimized preliminary motion scan and uses it to correct the Magnetic Resonance Fingerprinting acquisition data before dictionary search for reconstructing motion-corrected fat fraction and water T1 parametric maps of the upper-body region.
+Motion-corrected (MoCo) MRF T1-FF is a framework for free-breathing quantitative MRI that estimates the respiration motion field using an optimized preliminary motion scan and uses it to correct the Magnetic Resonance Fingerprinting acquisition data before dictionary search for reconstructing motion-corrected fat fraction (FF) and water T1 parametric maps of the upper-body region.
 
 <figure>
   <img
