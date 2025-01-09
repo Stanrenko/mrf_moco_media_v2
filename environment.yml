@@ -261,7 +261,6 @@ dependencies:
       - torchio==0.19.1
       - traitlets==5.14.3
       - triton==2.0.0
-      - twixtools==1.0
       - typer==0.15.1
       - typing-extensions==4.5.0
       - voxelmorph==0.2
