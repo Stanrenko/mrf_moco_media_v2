@@ -86,5 +86,6 @@ python build_maps.py --filenamevol data/mrf_scan_singular_volumes_allbins_regist
 ## References
 <a id="1">[1]</a> 
 Balakrishnan G, Zhao A, Sabuncu M. R., Guttag J and Dalca A. V., VoxelMorph: A Learning Framework for Deformable Medical Image Registration. IEEE Transactions on Medical Imaging, Aug. 2019. doi: 10.1109/TMI.2019.2897538
+
 <a id="2">[2]</a> 
 Slioussarenko C, Baudin P-Y, Reyngoudt H, Marty B. Bi-component dictionary matching for MR fingerprinting for efficient quantification of fat fraction and water T1 in skeletal muscle. Magn Reson Med. 2024; 91: 1179-1189. doi: 10.1002/mrm.29901
