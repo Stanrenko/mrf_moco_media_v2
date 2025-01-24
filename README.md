@@ -11,7 +11,7 @@ Motion-corrected (MoCo) MRF T1-FF is a framework for free-breathing quantitative
 
 ## Requirements
 
-After cloning the repository, one should create a conda environment using the requirements.txt.
+After cloning the repository, one should create a conda environment using the requirements.yml.
 ```
 conda env create --name <env> --file environment.yml
 conda activate <env>
